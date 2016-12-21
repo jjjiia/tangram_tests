@@ -1,0 +1,100 @@
+cameras:
+    camera1:
+        type: isometric
+        focal_length: 1.3
+
+
+lights:
+    light1:
+        type: directional
+        direction: [0, 1, -.5]
+        diffuse: 0
+        ambient: 0
+        visible: false
+    light2:
+        visible: true
+        type: point
+        position: [-74.044502, 40.689247, 20]
+        origin: world
+        ambient: .1
+        diffuse: 1
+        specular: .9
+        radius_inner: 10
+        radius_outter: 20
+        
+
+sources:
+    osm:
+        type: TopoJSON
+        url: https://tile.mapzen.com/mapzen/vector/v1/all/{z}/{x}/{y}.topojson?api_key=mapzen-QF1osLn
+        max_zoom: 15
+
+layers:
+    earth:
+        data: { source: osm }
+        draw:
+            polygons:
+                order: function() { return feature.sort_rank; }
+                color: '#ffffff'
+
+    landuse:
+        data: { source: osm }
+        draw:
+            polygons:
+                order: function() { return feature.sort_rank; }
+                color: '#ffffff'
+
+    water:
+        data: { source: osm }
+        draw:
+            polygons:
+                order: function() { return feature.sort_rank; }
+                color: '#ffffff'
+
+    roads:
+        data: { source: osm }
+        filter:
+            not: { kind: [path, rail, ferry] }
+        draw:
+            lines:
+                order: function() { return feature.sort_rank; }
+                color: '#ffffff'
+                width: 8
+                cap: round
+        highway:
+            filter:
+                kind: highway
+            draw:
+                lines:
+                    order: function() { return feature.sort_rank; }
+                    color: '#ffffff'
+                    width: 12
+                    outline:
+                        color: '#ffffff'
+                        width: 1.5
+        minor_road:
+            filter:
+                kind: minor_road
+            draw:
+                lines:
+                    order: function() { return feature.sort_rank; }
+                    color: '#ffffff'
+                    width: 5
+
+    buildings:
+        data: { source: osm }
+        draw:
+            polygons:
+                order: function() { return feature.sort_rank; }
+                color: |
+                    function () {
+                        var h = feature.height || 20;
+                        h = Math.min((h + 50)/ 255,1); // max brightness: 1
+                        h = Math.max(h, .1); // min brightness: 0
+                        return [h, h, h];
+                    }
+        3d-buildings:
+            filter: { $zoom: { min: 13 } }
+            draw:
+                polygons:
+                    extrude: function () { return feature.height > 20 || $zoom >= 16; }

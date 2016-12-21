@@ -1,0 +1,11 @@
+body{
+    font:helvetica;
+}
+a{
+    color:#000000;
+}
+
+.leaflet-control-attribution a {
+    text-decoration: none;
+    color:#000000;
+}
